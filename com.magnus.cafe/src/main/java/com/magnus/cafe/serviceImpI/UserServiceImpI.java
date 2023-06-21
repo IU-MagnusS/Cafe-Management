@@ -1,5 +1,8 @@
 package com.magnus.cafe.serviceImpI;
 
+import com.magnus.cafe.JWT.CustomerUserDetailsService;
+import com.magnus.cafe.JWT.JwtFilter;
+import com.magnus.cafe.JWT.JwtUtil;
 import com.magnus.cafe.POJO.User;
 import com.magnus.cafe.contents.CafeContents;
 import com.magnus.cafe.dao.UserDao;
@@ -9,8 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.net.Authenticator;
 import java.util.Map;
 import java.util.Objects;
 
@@ -20,6 +27,16 @@ public class UserServiceImpI implements UserService {
 
     @Autowired
     UserDao userDao;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    CustomerUserDetailsService customerUserDetailsService;
+
+    @Autowired
+    JwtUtil jwtUtil;
+
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
         log.info("Inside signup {}", requestMap);
@@ -35,22 +52,21 @@ public class UserServiceImpI implements UserService {
             } else {
                 return CafeUtils.getResponseEntity(CafeContents.INVALID_DATA, HttpStatus.BAD_REQUEST);
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return CafeUtils.getResponseEntity(CafeContents.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private boolean validateSignUpMap(Map<String, String> requestMap){
-        if(requestMap.containsKey("name") && requestMap.containsKey("contactNumber")
-                && requestMap.containsKey("email") && requestMap.containsKey("password"))
-        {
+    private boolean validateSignUpMap(Map<String, String> requestMap) {
+        if (requestMap.containsKey("name") && requestMap.containsKey("contactNumber")
+                && requestMap.containsKey("email") && requestMap.containsKey("password")) {
             return true;
         }
         return false;
     }
 
-    private User getUserFromMap(Map<String, String> requestMap){
+    private User getUserFromMap(Map<String, String> requestMap) {
         User user = new User();
         user.setName(requestMap.get("name"));
         user.setContactNumber(requestMap.get("contactNumber"));
@@ -60,6 +76,36 @@ public class UserServiceImpI implements UserService {
         user.setRole("user");
         return user;
 
+    }
 
+    @Override
+    public ResponseEntity<String> login(Map<String, String> requestMap) {
+        log.info("Inside login");
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(requestMap.get("email"), requestMap.get("password"))
+            );
+            if (auth.isAuthenticated()) {
+                if (customerUserDetailsService.getUserDetail().getStatus().equalsIgnoreCase("true")) {
+                    return new ResponseEntity<String>("{\"token\":\"" +
+                            jwtUtil.generateToken(customerUserDetailsService.getUserDetail().getEmail(),
+                                    customerUserDetailsService.getUserDetail().getRole()) + "\"}",
+                            HttpStatus.OK);
+                }
+                else {
+                    return new ResponseEntity<String>("{\"message\":\""+"Wait for admin approval. "+"\"}",
+                            HttpStatus.BAD_REQUEST);
+
+                }
+            }
+
+        } catch (Exception ex) {
+            log.error("{}", ex);
+        }
+
+        return new ResponseEntity<String>("{\"message\":\"" + "Bad Credentials. " + "\"}",
+                HttpStatus.BAD_REQUEST);
     }
 }
+
+
