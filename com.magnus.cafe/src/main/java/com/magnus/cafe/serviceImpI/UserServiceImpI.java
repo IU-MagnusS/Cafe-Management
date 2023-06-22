@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.net.Authenticator;
@@ -36,6 +37,9 @@ public class UserServiceImpI implements UserService {
 
     @Autowired
     JwtUtil jwtUtil;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
@@ -71,7 +75,8 @@ public class UserServiceImpI implements UserService {
         user.setName(requestMap.get("name"));
         user.setContactNumber(requestMap.get("contactNumber"));
         user.setEmail(requestMap.get("email"));
-        user.setPassword(requestMap.get("password"));
+        String encodedPassword = passwordEncoder.encode(requestMap.get("password"));
+        user.setPassword(encodedPassword); // Set the encoded password
         user.setStatus("false");
         user.setRole("user");
         return user;
@@ -95,12 +100,10 @@ public class UserServiceImpI implements UserService {
                 else {
                     return new ResponseEntity<String>("{\"message\":\""+"Wait for admin approval. "+"\"}",
                             HttpStatus.BAD_REQUEST);
-
                 }
             }
-
-        } catch (Exception ex) {
-            log.error("{}", ex);
+        }catch (Exception ex){
+            log.error("An error occurred:" ,ex);
         }
 
         return new ResponseEntity<String>("{\"message\":\"" + "Bad Credentials. " + "\"}",
