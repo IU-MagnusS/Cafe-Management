@@ -1,5 +1,6 @@
 package com.magnus.cafe.serviceImpI;
 
+import com.google.common.base.Strings;
 import com.magnus.cafe.JWT.CustomerUserDetailsService;
 import com.magnus.cafe.JWT.JwtFilter;
 import com.magnus.cafe.JWT.JwtUtil;
@@ -47,6 +48,7 @@ public class UserServiceImpI implements UserService {
 
     @Autowired
     EmailUtils emailUtils;
+
 
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
@@ -147,6 +149,48 @@ public class UserServiceImpI implements UserService {
             } else {
                 return CafeUtils.getResponseEntity(CafeContents.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
             }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return CafeUtils.getResponseEntity(CafeContents.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> checkToken() {
+
+        return CafeUtils.getResponseEntity("true", HttpStatus.OK);
+    }
+
+
+    @Override
+    public ResponseEntity<String> changePassword(Map<String, String> requestMap) {
+        try {
+            User userObj = userDao.findByEmail(jwtFilter.getCurrentUser());
+            if (userObj != null) {
+                String enteredOldPassword = requestMap.get("oldPassword");
+                if (passwordEncoder.matches(enteredOldPassword, userObj.getPassword())) {
+                    String newEncodedPassword = passwordEncoder.encode(requestMap.get("newPassword"));
+                    userObj.setPassword(newEncodedPassword);
+                    userDao.save(userObj);
+                    return CafeUtils.getResponseEntity("Password Updated Successfully", HttpStatus.OK);
+                }
+                return CafeUtils.getResponseEntity("Incorrect Previous Password", HttpStatus.BAD_REQUEST);
+            }
+            return CafeUtils.getResponseEntity(CafeContents.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return  CafeUtils.getResponseEntity(CafeContents.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> forgotPassword(Map<String, String> requestMap) {
+        try {
+            User user = userDao.findByEmail(requestMap.get("email"));
+            if (!Objects.isNull(user) && !Strings.isNullOrEmpty(user.getEmail()))
+                emailUtils.forgotMail(user.getEmail(), "Credential by Cafe Management", user.getPassword());
+
+                return CafeUtils.getResponseEntity("Check your mail for Credentials", HttpStatus.OK);
         }catch (Exception ex){
             ex.printStackTrace();
         }
