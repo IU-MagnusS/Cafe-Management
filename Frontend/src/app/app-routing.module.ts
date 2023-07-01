@@ -1,14 +1,8 @@
 import { NgModule } from '@angular/core';
-<<<<<<< Updated upstream
-import { Router, RouterModule, Routes } from '@angular/router';
-import { HomeComponent } from './home/home.component';
-import { FullComponent } from './layouts/full/full.component';
-import { RouteGuardService } from './services/route-guard.service';
-=======
 import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { FullComponent } from './layouts/full/full.component';
->>>>>>> Stashed changes
+import { RouteGuardService } from './services/route-guard.service';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -23,16 +17,11 @@ const routes: Routes = [
       },
       {
         path: '',
-        loadChildren:
-          () => import('./material-component/material.module').then(m => m.MaterialComponentsModule),
-<<<<<<< Updated upstream
-          canActivate:[RouteGuardService],
-          data:{
-            expectedRole:['admin','user'],
-          }
-
-=======
->>>>>>> Stashed changes
+        loadChildren: () => import('./material-component/material.module').then(m => m.MaterialComponentsModule),
+        canActivate: [RouteGuardService],
+        data: {
+          expectedRole: ['admin', 'user'],
+        }
       },
       {
         path: 'dashboard',
