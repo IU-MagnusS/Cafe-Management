@@ -50,13 +50,6 @@
 		</dependency>
 
 		<dependency>
-<<<<<<< HEAD
-			<groupId>jakarta.persistence</groupId>
-			<artifactId>jakarta.persistence-api</artifactId>
-			<version>3.0.0</version>
-		</dependency>
-
-=======
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itextpdf</artifactId>
 			<version>5.5.10</version>
@@ -127,9 +120,6 @@
 			<version>2.2</version>
 		</dependency>
 
-
-
->>>>>>> FE-Angular
 	</dependencies>
 
 	<build>
