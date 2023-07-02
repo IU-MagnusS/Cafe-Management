@@ -9,7 +9,9 @@ export interface Menu {
 }
 
 const MENUITEMS: Menu[] = [
-  { state: 'dashboard', name: 'Dashboard', type: 'link', icon: 'dashboard', role: '' }
+  { state: 'dashboard', name: 'Dashboard', type: 'link', icon: 'dashboard', role: 'admin' },
+  { state: 'category', name: 'Category', type: 'link', icon: 'category', role: 'admin' }
+
 ];
 
 @Injectable()
@@ -18,3 +20,4 @@ export class MenuItems {
     return MENUITEMS;
   }
 }
+
