@@ -20,6 +20,9 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { LoginComponent } from './login/login.component';
 import { Token } from '@angular/compiler';
 import { TokenInterceptorInterceptor } from './services/token-interceptor.interceptor';
+import { MatListModule } from '@angular/material/list';
+import { MatIconModule } from '@angular/material/icon';
+
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig ={
   text:"Loading...",
@@ -54,7 +57,9 @@ const ngxUiLoaderConfig: NgxUiLoaderConfig ={
     FlexLayoutModule,
     SharedModule,
     HttpClientModule,
-    NgxUiLoaderModule.forRoot(ngxUiLoaderConfig)
+    NgxUiLoaderModule.forRoot(ngxUiLoaderConfig),
+    MatListModule,
+    MatIconModule
   ],
   providers: [HttpClientModule,{provide:HTTP_INTERCEPTORS,useClass:TokenInterceptorInterceptor, multi:true}],
   bootstrap: [AppComponent]
