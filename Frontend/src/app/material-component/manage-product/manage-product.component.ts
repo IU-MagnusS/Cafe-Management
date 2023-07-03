@@ -91,32 +91,32 @@ export class ManageProductComponent implements OnInit {
     });
   }
 
-  handleDeleteAction(value: any) {
+  handleDeleteAction(values: any) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.data = {
-      message: 'Delete ' + value.name + ' product',
+      message: 'delete ' + values.name + ' product',
       confirmation: true
     };
     const dialogRef = this.dialog.open(ConfirmationComponent, dialogConfig);
-    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-      if (confirmed) {
-        this.ngxService.start();
-        this.deleteProduct(value.id);
-        dialogRef.close();
-      }
+    const sub = dialogRef.componentInstance.onEmitStatusChange.subscribe((response: any) => {
+      this.ngxService.start();
+      this.deleteProduct(values.id);
+      dialogRef.close();
     });
   }
+  
 
   deleteProduct(id: any) {
     this.productService.delete(id).subscribe(
-      () => {
+      (response: any) => {
         this.ngxService.stop();
-        this.snackbarService.openSnackBar('Product deleted successfully.', 'success');
         this.tableData();
+        this.responseMessage = response?.message;
+        this.snackbarService.openSnackBar(this.responseMessage, "success");
       },
       (error: any) => {
         this.ngxService.stop();
-        console.log(error);
+        console.log(error.error?.message);
         if (error.error?.message) {
           this.responseMessage = error.error?.message;
         } else {
@@ -126,6 +126,7 @@ export class ManageProductComponent implements OnInit {
       }
     );
   }
+  
 
   onChange(status: any, id: any) {
     this.ngxService.start();
@@ -133,7 +134,7 @@ export class ManageProductComponent implements OnInit {
       status: status.toString(),
       id: id
     };
-
+  
     this.productService.updateStatus(data).subscribe(
       (response: any) => {
         this.ngxService.stop();
@@ -151,5 +152,5 @@ export class ManageProductComponent implements OnInit {
         this.snackbarService.openSnackBar(this.responseMessage, GlobalConstants.error);
       }
     );
-  }
+  }  
 }
