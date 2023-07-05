@@ -13,7 +13,8 @@ const MENUITEMS: Menu[] = [
   { state: 'category', name: 'Category', type: 'link', icon: 'category', role: 'admin' },
   { state: 'product', name: 'Product', type: 'link', icon: 'inventory', role: 'admin' },
   { state: 'order', name: 'Order', type: 'link', icon: 'shopping_cart', role: 'admin' },
-  { state: 'bill', name: 'Bill', type: 'link', icon: 'backup_table', role: 'admin' }
+  { state: 'bill', name: 'Bill', type: 'link', icon: 'backup_table', role: 'admin' },
+  { state: 'user', name: 'User', type: 'link', icon: 'people', role: 'admin' }
 
 ];
 
