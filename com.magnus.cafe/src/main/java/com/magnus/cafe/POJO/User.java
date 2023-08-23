@@ -9,10 +9,15 @@ import java.io.Serializable;
 
 @NamedQuery(name = "User.findByEmailId", query = "select u from User u where u.email=:email")
 
-
 @NamedQuery(name = "User.getAllUser", query = "select new com.magnus.cafe.wrapper.UserWrapper(u.id, u.name,u.email,u.contactNumber,u.status) from User u where u.role='user'" )
 
 @NamedQuery(name = "User.updateStatus", query = "update User u set u.status =:status where u.id=:id")
+
+@NamedQuery(name = "User.updateEmail", query = "update User u set u.email = :email where u.id = :id")
+
+@NamedQuery(name = "User.updateContactNumber", query = "update User u set u.contactNumber = :contactNumber where u.id = :id")
+
+@NamedQuery(name = "User.updateName", query = "update User u set u.name = :name where u.id = :id")
 
 @NamedQuery(name = "User.getAllAdmin", query = "select u.email  from User u where u.role='admin'" )
 

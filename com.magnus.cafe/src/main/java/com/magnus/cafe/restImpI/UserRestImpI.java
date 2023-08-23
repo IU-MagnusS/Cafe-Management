@@ -63,6 +63,7 @@ public class UserRestImpI implements UserRest {
         return CafeUtils.getResponseEntity(CafeContents.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+
     @Override
     public ResponseEntity<String> checkToken() {
         try {

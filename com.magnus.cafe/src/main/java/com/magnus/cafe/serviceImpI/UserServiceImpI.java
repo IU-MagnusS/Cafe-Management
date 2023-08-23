@@ -72,11 +72,8 @@ public class UserServiceImpI implements UserService {
     }
 
     private boolean validateSignUpMap(Map<String, String> requestMap) {
-        if (requestMap.containsKey("name") && requestMap.containsKey("contactNumber")
-                && requestMap.containsKey("email") && requestMap.containsKey("password")) {
-            return true;
-        }
-        return false;
+        return requestMap.containsKey("name") && requestMap.containsKey("contactNumber")
+                && requestMap.containsKey("email") && requestMap.containsKey("password");
     }
 
     private User getUserFromMap(Map<String, String> requestMap) {
@@ -137,23 +134,45 @@ public class UserServiceImpI implements UserService {
     public ResponseEntity<String> update(Map<String, String> requestMap) {
         try {
             if (jwtFilter.isAdmin()) {
-                Optional<User> optional = userDao.findById(Integer.parseInt(requestMap.get("id")));
-                if(!optional.isEmpty()) {
-                    userDao.updateStatus(requestMap.get("status"),Integer.parseInt(requestMap.get("id")));
-                    sendMailToAllAdmin(requestMap.get("status"), optional.get().getEmail(), userDao.getAllAdmin());
-                    return  CafeUtils.getResponseEntity("User status updated successfully", HttpStatus.OK);
-                }
-                else {
+                int userId = Integer.parseInt(requestMap.get("id"));
+                Optional<User> optional = userDao.findById(userId);
+                if (!optional.isEmpty()) {
+                    User user = optional.get();
+
+                    if (requestMap.containsKey("status")) {
+                        userDao.updateStatus(requestMap.get("status"), userId);
+                    }
+
+                    if (requestMap.containsKey("email")) {
+                        user.setEmail(requestMap.get("email"));
+                        userDao.updateEmail(user.getEmail(), userId);
+                    }
+
+                    if (requestMap.containsKey("name")) {
+                        user.setName(requestMap.get("name"));
+                        userDao.updateName(user.getName(), userId);
+                    }
+
+                    if (requestMap.containsKey("contactNumber")) {
+                        user.setContactNumber(requestMap.get("contactNumber"));
+                        userDao.updateContactNumber(user.getContactNumber(), userId);
+                    }
+
+                    sendMailToAllAdmin(user.getStatus(), user.getEmail(), userDao.getAllAdmin());
+                    return CafeUtils.getResponseEntity("User information updated successfully", HttpStatus.OK);
+                } else {
                     return CafeUtils.getResponseEntity("User ID does not exist", HttpStatus.OK);
                 }
             } else {
                 return CafeUtils.getResponseEntity(CafeContents.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return CafeUtils.getResponseEntity(CafeContents.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
 
     @Override
     public ResponseEntity<String> checkToken() {
@@ -196,6 +215,7 @@ public class UserServiceImpI implements UserService {
         }
         return CafeUtils.getResponseEntity(CafeContents.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 
     private void sendMailToAllAdmin(String status, String user, List<String> allAdmin) {
         allAdmin.remove(jwtFilter.getCurrentUser());

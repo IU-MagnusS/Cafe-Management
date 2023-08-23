@@ -2,6 +2,7 @@ package com.magnus.cafe.restImpI;
 
 import com.magnus.cafe.POJO.Bill;
 import com.magnus.cafe.contents.CafeContents;
+import com.magnus.cafe.dao.BillDao;
 import com.magnus.cafe.rest.BillRest;
 import com.magnus.cafe.service.BillService;
 import com.magnus.cafe.utils.CafeUtils;
@@ -18,6 +19,9 @@ public class BillRestImpI implements BillRest {
 
     @Autowired
     BillService billService;
+
+    @Autowired
+    BillDao billDao;
 
 
     @Override
