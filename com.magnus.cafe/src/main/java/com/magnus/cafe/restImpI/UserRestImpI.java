@@ -9,12 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:8080")
 public class UserRestImpI implements UserRest {
     @Autowired
     UserService userService;
@@ -45,7 +48,6 @@ public class UserRestImpI implements UserRest {
         try {
             return userService.getAllUser();
 
-
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -62,6 +64,7 @@ public class UserRestImpI implements UserRest {
         }
         return CafeUtils.getResponseEntity(CafeContents.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 
     @Override
     public ResponseEntity<String> checkToken() {
@@ -92,6 +95,16 @@ public class UserRestImpI implements UserRest {
             return userService.forgotPassword(requestMap);
 
         }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return CafeUtils.getResponseEntity(CafeContents.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> deleteUsers(List<Integer> userIds) {
+        try {
+            return userService.deleteUsers(userIds);
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return CafeUtils.getResponseEntity(CafeContents.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
